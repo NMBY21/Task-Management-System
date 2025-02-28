@@ -2,36 +2,42 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL = "http://127.0.0.1:8000/api/tasks";
+const token = localStorage.getItem("token");
+
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+});
 
 // Fetch tasks
 export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async () => {
-  const response = await axios.get(API_URL);
+  const response = await axiosInstance.get("/");
   return response.data;
 });
 
 // Add task
 export const addTask = createAsyncThunk("tasks/addTask", async (taskData) => {
-  const response = await axios.post(API_URL, taskData);
+  const response = await axiosInstance.post("/", taskData);
   return response.data;
 });
 
 // Update task
 export const updateTask = createAsyncThunk(
   "tasks/updateTask",
-  async ({ taskId, updatedData }) => {
-    const response = await axios.put(`${API_URL}/${taskId}`, updatedData);
+  async ({ id, updatedData }) => {
+    const response = await axiosInstance.put(`/${id}`, updatedData);
     return response.data;
   }
 );
 
 // Delete task
-export const deleteTask = createAsyncThunk(
-  "tasks/deleteTask",
-  async (taskId) => {
-    await axios.delete(`${API_URL}/${taskId}`);
-    return taskId;
-  }
-);
+export const deleteTask = createAsyncThunk("tasks/deleteTask", async (id) => {
+  await axiosInstance.delete(`/${id}`);
+  return id;
+});
 
 const taskSlice = createSlice({
   name: "tasks",
