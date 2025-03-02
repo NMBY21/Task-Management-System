@@ -13,8 +13,9 @@ const axiosInstance = axios.create({
 });
 
 // Fetch tasks
-export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async () => {
-  const response = await axiosInstance.get("/");
+export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (filters = {}) => {
+  const params = new URLSearchParams(filters).toString();
+  const response = await axiosInstance.get(`/?${params}`);
   return response.data;
 });
 
